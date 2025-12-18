@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,        // <--- Set this to true
+    "allowSyntheticDefaultImports": true, // <--- Set this to true
+    "moduleResolution": "node"
+  }
+}

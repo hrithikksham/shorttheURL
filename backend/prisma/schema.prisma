@@ -1,0 +1,31 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Url {
+  id        Int      @id @default(autoincrement()) // Auto-incrementing integer ID
+  original  String   @db.Text
+  shortCode String   @unique @map("short_code")
+  createdAt DateTime @default(now()) @map("created_at")
+  clicks    Int      @default(0)
+
+  @@index([shortCode]) // ⚡ Crucial for fast lookups
+  @@map("urls")
+}
+
+// Simple analytics for now
+model Analytics {
+  id        Int      @id @default(autoincrement())
+  shortCode String   @map("short_code")
+  ip        String?
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("analytics")
+}
