@@ -1,5 +1,5 @@
 // src/repositories/url.repository.ts
-import prisma from '../../config/database';
+import { prisma } from '../../config/database';
 import { Url } from '../models/url.model';
 
 export class UrlRepository {

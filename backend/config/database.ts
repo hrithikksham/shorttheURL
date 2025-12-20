@@ -1,7 +1,4 @@
-// src/config/database.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-// Singleton pattern for DB connection
-const prisma = new PrismaClient();
-
-export default prisma;
+export const prisma = new PrismaClient();
+    

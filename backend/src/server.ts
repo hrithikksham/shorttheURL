@@ -1,7 +1,7 @@
 // src/server.ts
-import app from './app';
-import { config } from '../config/env';
 
+import { config } from '../config/env';
+import app from './app';
 const start = async () => {
   try {
     await app.listen({ port: Number(config.port), host: '0.0.0.0' });
