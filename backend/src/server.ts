@@ -1,7 +1,7 @@
-// src/server.ts
-
 import { config } from '../config/env';
 import app from './app';
+import './workers/analytics.worker';
+
 const start = async () => {
   try {
     await app.listen({ port: Number(config.port), host: '0.0.0.0' });

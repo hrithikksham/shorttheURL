@@ -1,16 +1,22 @@
-// src/app.ts
-import fastify from 'fastify';
+import fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import { shortenRoutes } from './routes/shorten.routes';
 import { redirectRoutes } from './routes/redirect.routes';
+import { rateLimiter } from './middlewares/rateLimit.middleware';
 
-const app = fastify({ logger: true });
+const app: FastifyInstance = fastify({ logger: true });
 
-// Middlewares
 app.register(cors, { origin: '*' });
 
-// Routes registration
+// --- REGISTER MIDDLEWARE HERE ---
+// Fastify uses 'addHook' for middlewares
+app.addHook('onRequest', rateLimiter); 
+
 app.register(shortenRoutes);
 app.register(redirectRoutes);
+
+app.get('/health', async () => {
+  return { status: 'ok', timestamp: new Date() };
+});
 
 export default app;
