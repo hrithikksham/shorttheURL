@@ -115,10 +115,6 @@ const Home = () => {
         )}
       </div>
 
-      {/* Footer */}
-      <div className="mt-12 text-sm text-gray-400">
-        Built with React, Tailwind & Node.js
-      </div>
     </div>
   );
 };
