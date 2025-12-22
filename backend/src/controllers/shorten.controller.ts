@@ -3,19 +3,16 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { UrlService } from '../services/url.service';
 import { z } from 'zod'; // Assuming Zod for validation
 
-export const shortenUrl = async (req: FastifyRequest, reply: FastifyReply) => {
-  // Input Validation
-  const bodySchema = z.object({
-    longUrl: z.string().url(),
-  });
+export const shortenUrl = async (req: FastifyRequest<{ Body: { longUrl: string; customAlias?: string } }>, reply: FastifyReply) => {
+  const { longUrl, customAlias } = req.body;
 
   try {
-    const { longUrl } = bodySchema.parse(req.body);
-    
     const shortUrl = await UrlService.shorten(longUrl);
-    
     return reply.status(201).send({ shortUrl });
-  } catch (error) {
-    return reply.status(400).send({ error: 'Invalid URL or Server Error' });
+  } catch (error: any) {
+    if (error.message === 'Alias already in use') {
+      return reply.status(409).send({ error: 'Custom alias is already taken.' });
+    }
+    return reply.status(500).send({ error: 'Internal Server Error' });
   }
 };
