@@ -3,7 +3,7 @@ import axios from 'axios';
 
 // Create a single instance for the whole app
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://shorttheurl-s266.onrender.com',
+  baseURL: import.meta.env.VITE_API_URL || 'https://shorttheurl-qawf.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
