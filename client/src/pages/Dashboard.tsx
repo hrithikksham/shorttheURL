@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { format } from 'date-fns';
-import { ArrowLeft, MousePointer, Smartphone, Globe, Clock, Monitor } from 'lucide-react';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell 
+} from 'recharts';
+import { format, parseISO } from 'date-fns';
+import { ArrowLeft, MousePointer, Smartphone, Chrome, Globe, Clock, Monitor, Command } from 'lucide-react';
 import apiClient from '../services/apiClient';
 
 // Types
@@ -35,24 +38,33 @@ const Dashboard = () => {
     if (shortCode) fetchStats();
   }, [shortCode]);
 
-  // Process Chart Data
+  // 1. Process Traffic Chart (Grouped by Hour for "Velocity")
   const chartData = useMemo(() => {
     if (!data?.recentActivity) return [];
-    return data.recentActivity.map((log, index) => ({
-      name: `Visit ${index + 1}`,
-      time: format(new Date(log.createdAt), 'HH:mm'),
-    }));
+    
+    const groups: Record<string, number> = {};
+    
+    // Aggregate clicks by hour
+    data.recentActivity.forEach(log => {
+      const dateObj = new Date(log.createdAt);
+      // Format: "10:00", "11:00"
+      const timeKey = format(dateObj, 'HH:00'); 
+      groups[timeKey] = (groups[timeKey] || 0) + 1;
+    });
+
+    // Convert to array and sort by time
+    return Object.keys(groups)
+      .map(time => ({ time, clicks: groups[time] }))
+      .sort((a, b) => a.time.localeCompare(b.time));
   }, [data]);
 
-  // Process Device Data (FIXED: No external library needed)
+  // 2. Process Device Data
   const deviceStats = useMemo(() => {
     if (!data?.recentActivity) return [];
     const stats: Record<string, number> = { Desktop: 0, Mobile: 0 };
     
     data.recentActivity.forEach(log => {
-      // Simple Regex check for mobile devices
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(log.userAgent);
-      
       if (isMobile) stats.Mobile++;
       else stats.Desktop++;
     });
@@ -61,6 +73,25 @@ const Dashboard = () => {
       { name: 'Desktop', value: stats.Desktop },
       { name: 'Mobile', value: stats.Mobile },
     ].filter(i => i.value > 0);
+  }, [data]);
+
+  // 3. Process Top Browser
+  const topBrowser = useMemo(() => {
+    if (!data?.recentActivity || data.recentActivity.length === 0) return 'No Data';
+    
+    const browsers: Record<string, number> = {};
+    data.recentActivity.forEach(log => {
+      const ua = log.userAgent.toLowerCase();
+      let name = 'Other';
+      if (ua.includes('chrome')) name = 'Chrome';
+      else if (ua.includes('firefox')) name = 'Firefox';
+      else if (ua.includes('safari') && !ua.includes('chrome')) name = 'Safari';
+      else if (ua.includes('edge')) name = 'Edge';
+      
+      browsers[name] = (browsers[name] || 0) + 1;
+    });
+
+    return Object.keys(browsers).reduce((a, b) => browsers[a] > browsers[b] ? a : b);
   }, [data]);
 
   const COLORS = ['#3b82f6', '#8b5cf6']; // Blue & Purple
@@ -75,8 +106,8 @@ const Dashboard = () => {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <Link to="/" className="text-zinc-500 hover:text-white flex items-center gap-2 mb-2 transition-colors text-sm">
-              <ArrowLeft className="w-4 h-4" /> Back to Creator
+            <Link to="/analytics" className="text-zinc-500 hover:text-white flex items-center gap-2 mb-2 transition-colors text-sm">
+              <ArrowLeft className="w-4 h-4" /> Back to Search
             </Link>
             <h1 className="text-3xl font-bold text-white tracking-tight">
               Analytics for <span className="text-blue-500 font-mono">/{shortCode}</span>
@@ -99,36 +130,66 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-3xl flex items-center gap-5 opacity-75">
-            <div className="p-4 bg-purple-500/10 rounded-2xl text-purple-400">
-              <Globe className="w-6 h-6" />
+          <div className="glass-panel p-6 rounded-3xl flex items-center gap-5">
+            <div className="p-4 bg-orange-500/10 rounded-2xl text-orange-400">
+              {topBrowser === 'Chrome' ? <Chrome className="w-6 h-6" /> : 
+               topBrowser === 'Safari' ? <Command className="w-6 h-6" /> : 
+               <Globe className="w-6 h-6" />}
             </div>
             <div>
-              <p className="text-zinc-500 text-sm font-medium">Top Location</p>
-              <p className="text-xl font-semibold text-white mt-1">Unknown</p>
+              <p className="text-zinc-500 text-sm font-medium">Top Browser</p>
+              <p className="text-2xl font-semibold text-white mt-1">{topBrowser}</p>
             </div>
           </div>
         </div>
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Main Bar Chart */}
-          <div className="lg:col-span-2 glass-panel p-6 rounded-3xl">
-            <h3 className="text-lg font-semibold text-zinc-200 mb-6">Traffic Velocity</h3>
+          {/*  Traffic Velocity Area Chart */}
+          <div className="lg:col-span-2 glass-panel p-6 rounded-3xl flex flex-col">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-zinc-200">Traffic Velocity</h3>
+              <div className="text-xs text-zinc-500 font-mono">Clicks per Hour</div>
+            </div>
+            
             <div className="h-[300px] w-full">
               {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData}>
-                    <XAxis dataKey="time" stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#52525b" tick={{fill: '#71717a', fontSize: 12}} tickLine={false} axisLine={false} />
+                  <AreaChart data={chartData}>
+                    {/* Gradient Definition */}
+                    <defs>
+                      <linearGradient id="colorClicks" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+                    <XAxis 
+                      dataKey="time" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fill: '#71717a', fontSize: 12}} 
+                      dy={10}
+                    />
+                    <YAxis 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{fill: '#71717a', fontSize: 12}} 
+                    />
                     <Tooltip 
                       contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px', color: '#fff' }}
-                      itemStyle={{ color: '#e4e4e7' }}
-                      cursor={{fill: 'rgba(255,255,255,0.05)'}}
+                      itemStyle={{ color: '#60a5fa' }} // Light Blue text
+                      cursor={{ stroke: '#3b82f6', strokeWidth: 1, strokeDasharray: '4 4' }}
                     />
-                    <Bar dataKey="name" fill="#3b82f6" radius={[4, 4, 4, 4]} barSize={40} />
-                  </BarChart>
+                    <Area 
+                      type="monotone" 
+                      dataKey="clicks" 
+                      stroke="#3b82f6" 
+                      strokeWidth={3}
+                      fillOpacity={1} 
+                      fill="url(#colorClicks)" 
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex flex-col items-center justify-center text-zinc-600">
@@ -200,9 +261,6 @@ const Dashboard = () => {
                 </div>
               </div>
             ))}
-            {(!data?.recentActivity || data.recentActivity.length === 0) && (
-              <div className="text-center py-8 text-zinc-600">No recent activity found</div>
-            )}
           </div>
         </div>
 

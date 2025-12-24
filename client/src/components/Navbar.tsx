@@ -32,14 +32,14 @@ const Navbar = () => {
           
           {/* We point to a demo stat for the link, or just disable if no ID */}
           <Link 
-            to="/stats/demo" 
+            to="/analytics" 
             className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-              location.pathname.includes('/stats') ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
-            }`}
-          >
-            <BarChart2 className="w-4 h-4" />
-            Analytics
-          </Link>
+              location.pathname.includes('/analytics') ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
+              }`}
+              >
+                <BarChart2 className="w-4 h-4" />
+                Analytics
+              </Link>
         </div>
 
         {/* GitHub Icon */}
