@@ -44,7 +44,7 @@ const Navbar = () => {
 
         {/* GitHub Icon */}
         <a 
-          href="https://github.com/hrithikksham" 
+          href="https://github.com/hrithikksham/shorttheURL" 
           target="_blank" 
           rel="noreferrer"
           className="text-zinc-500 hover:text-white transition-colors"
