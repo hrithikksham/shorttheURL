@@ -8,8 +8,8 @@ const app: FastifyInstance = fastify({ logger: true });
 
 app.register(cors, {
   origin: [
-    'http://localhost:5173',                  // Local Development
-    'https://makeitshort-ten.vercel.app/'   // <-- ADD YOUR VERCEL DOMAIN HERE
+    'http://localhost:5173',                   // Local testing
+    "https://makeitshort-ten.vercel.app"
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
