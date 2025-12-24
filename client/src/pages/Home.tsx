@@ -56,13 +56,13 @@ const Home = () => {
 
         {/* Hero Title */}
         <h1 className="text-4xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/50">
-          Shorten links, <br className="hidden md:block" /> 
-          <span className="text-white">expand reach.</span>
+          Make it, <br className="hidden md:block" /> 
+          <span className="text-white">Short.</span>
         </h1>
 
         <p className="text-base md:text-xl text-zinc-400 max-w-2xl mb-12 leading-relaxed">
           A powerful URL shortener built for modern creators. 
-          Track clicks, analyze locations, and optimize your sharing workflow.
+          Track clicks, analyze insights, and optimize your sharing workflow.
         </p>
 
         {/* Input Box - Responsive Layout */}
