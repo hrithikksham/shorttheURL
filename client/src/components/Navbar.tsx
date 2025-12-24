@@ -1,59 +1,88 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Link2, BarChart2, Github } from 'lucide-react';
+import { Link2, BarChart2, Github, Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false); // State for mobile menu
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
-      <nav className="glass-panel rounded-full px-6 py-3 flex items-center gap-8 shadow-2xl shadow-black/50">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/80 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <div className="p-1.5 bg-blue-600/20 rounded-lg group-hover:bg-blue-600/30 transition-colors">
+        <Link to="/" className="flex items-center gap-2 group" onClick={() => setIsOpen(false)}>
+          <div className="p-2 bg-white/5 rounded-xl group-hover:bg-white/10 transition-colors border border-white/5">
             <Link2 className="w-5 h-5 text-blue-500" />
           </div>
-          <span className="font-semibold text-lg tracking-tight text-white">Short.ly</span>
+          <span className="font-bold text-lg tracking-tight text-white">Shortly</span>
         </Link>
-        
-        {/* Divider */}
-        <div className="h-4 w-[1px] bg-white/10"></div>
 
-        {/* Links */}
-        <div className="flex items-center gap-6">
+        {/* Desktop Links (Hidden on Mobile) */}
+        <div className="hidden md:flex items-center gap-8">
           <Link 
             to="/" 
-            className={`text-sm font-medium transition-colors ${
-              location.pathname === '/' ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
-            }`}
+            className={`text-sm font-medium transition-colors ${isActive('/') ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
           >
-            Create
+            Shorten
           </Link>
-          
-          {/* We point to a demo stat for the link, or just disable if no ID */}
           <Link 
             to="/analytics" 
-            className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-              location.pathname.includes('/analytics') ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'
-              }`}
-              >
-                <BarChart2 className="w-4 h-4" />
-                Analytics
-              </Link>
+            className={`flex items-center gap-2 text-sm font-medium transition-colors ${isActive('/analytics') ? 'text-white' : 'text-zinc-400 hover:text-zinc-200'}`}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Analytics
+          </Link>
+          <a 
+            href="https://github.com/hrithikksham" 
+            target="_blank" 
+            rel="noreferrer"
+            className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-all"
+          >
+            <Github className="w-5 h-5" />
+          </a>
         </div>
 
-        {/* GitHub Icon */}
-        <a 
-          href="https://github.com/hrithikksham/shorttheURL" 
-          target="_blank" 
-          rel="noreferrer"
-          className="text-zinc-500 hover:text-white transition-colors"
+        {/* Mobile Menu Button (Visible only on Mobile) */}
+        <button 
+          className="md:hidden p-2 text-zinc-400 hover:text-white"
+          onClick={() => setIsOpen(!isOpen)}
         >
-          <Github className="w-5 h-5" />
-        </a>
+          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
 
-      </nav>
-    </div>
+      {/* Mobile Menu Dropdown */}
+      {isOpen && (
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-[#050505] border-b border-white/5 p-4 flex flex-col gap-4 shadow-2xl animate-in slide-in-from-top-5">
+          <Link 
+            to="/" 
+            onClick={() => setIsOpen(false)}
+            className={`p-3 rounded-xl text-sm font-medium ${isActive('/') ? 'bg-white/10 text-white' : 'text-zinc-400'}`}
+          >
+            Shorten URL
+          </Link>
+          <Link 
+            to="/analytics" 
+            onClick={() => setIsOpen(false)}
+            className={`p-3 rounded-xl flex items-center gap-2 text-sm font-medium ${isActive('/analytics') ? 'bg-white/10 text-white' : 'text-zinc-400'}`}
+          >
+            <BarChart2 className="w-4 h-4" />
+            Analytics Dashboard
+          </Link>
+          <a 
+            href="https://github.com/hrithikksham/shorttheurl" 
+            target="_blank"
+            className="p-3 rounded-xl flex items-center gap-2 text-sm font-medium text-zinc-400 hover:bg-white/5 hover:text-white"
+          >
+            <Github className="w-4 h-4" />
+            GitHub Profile
+          </a>
+        </div>
+      )}
+    </nav>
   );
 };
 
