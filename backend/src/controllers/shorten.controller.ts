@@ -3,24 +3,24 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { UrlService } from '../services/url.service';
 
 export const shortenUrl = async (req: FastifyRequest, reply: FastifyReply) => {
-  // 1. FIX INPUT: Accept 'originalUrl' (matches Frontend) OR 'longUrl' (matches Postman/tests)
   const body = req.body as { originalUrl?: string; longUrl?: string; customAlias?: string };
   const urlToShorten = body.originalUrl || body.longUrl;
-
+  const customAlias = body.customAlias || "";
   if (!urlToShorten) {
     return reply.status(400).send({ error: 'Missing originalUrl or longUrl' });
   }
 
   try {
-    // 2. Call Service
-    // (Assuming UrlService.shorten returns just the code like "abc12". 
-    // If it returns a full object, you might need 'result.shortCode')
-    const result = await UrlService.shorten(urlToShorten);
+    // 1. Get the result from the service (which might be a full URL like "http://.../abc")
+    const result = await UrlService.shorten(urlToShorten, body.customAlias);
 
-    // 3. FIX OUTPUT: Send 'shortCode' exactly as Frontend expects
+    // 2. SMART FIX: If result is a full URL, split it and take the last part
+    // This ensures we always send just the code "abc" or "j"
+    const code = result.includes('/') ? result.split('/').pop() : result;
+
     return reply.status(201).send({ 
       success: true,
-      shortCode: result, // <--- This fixes the "Missing ID/ShortCode" error
+      shortCode: code, // Now this is guaranteed to be just the code
       originalUrl: urlToShorten
     });
 
