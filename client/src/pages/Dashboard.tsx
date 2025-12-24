@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell 
 } from 'recharts';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { ArrowLeft, MousePointer, Smartphone, Chrome, Globe, Clock, Monitor, Command } from 'lucide-react';
 import apiClient from '../services/apiClient';
 
@@ -216,7 +216,7 @@ const Dashboard = () => {
                       dataKey="value"
                       stroke="none"
                     >
-                      {deviceStats.map((entry, index) => (
+                      {deviceStats.map((_, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
