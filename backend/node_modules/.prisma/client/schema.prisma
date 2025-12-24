@@ -1,8 +1,7 @@
 generator client {
-  provider = "prisma-client-js"
+  provider   = "prisma-client-js"
   engineType = "binary"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -11,7 +10,7 @@ datasource db {
 
 model Url {
   id        Int      @id @default(autoincrement())
-  original  String   
+  original  String
   shortCode String   @unique @map("short_code")
   createdAt DateTime @default(now()) @map("created_at")
   clicks    Int      @default(0)
