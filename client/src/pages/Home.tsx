@@ -1,4 +1,4 @@
-import React, { useState, version } from 'react';
+import React, { useState} from 'react';
 import { Link2, ArrowRight, Copy, Check, Zap, Shield, BarChart3, AlertCircle } from 'lucide-react';
 import apiClient from '../services/apiClient';
 
@@ -87,10 +87,10 @@ const Home = () => {
         {/* Hero Title */}
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
           <span className="bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-white/40">
-            Make it
+            Make it 
           </span><span> </span>
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-            Short .
+            Short !
           </span>
         </h1>
 
