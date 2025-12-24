@@ -15,6 +15,6 @@ export const config = {
     password : process.env.REDIS_PASSWORD
   },
   app: {
-    baseUrl: process.env.BASE_URL || 'http://localhost:3000'
+    baseUrl: process.env.BASE_URL || "https://shorttheurl-qawf.onrender.com"
   }
 };
