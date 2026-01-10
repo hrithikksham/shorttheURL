@@ -88,7 +88,7 @@ Follow these steps to set up the project locally.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/hrithikksham/shorttheURL.git](https://github.com/hrithikksham/shorttheURL.git)
+git clone https://github.com/hrithikksham/shorttheURL.git
 cd shorttheURL
 
 ```
